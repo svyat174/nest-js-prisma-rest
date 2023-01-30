@@ -12,6 +12,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -20,7 +21,15 @@ export class UserController {
   @Post()
   @UsePipes(new ValidationPipe())
   async create(@Body() createUserDto: CreateUserDto) {
-    return await this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
+    return this.userService.buildUserResponse(user);
+  }
+
+  @Post('login')
+  @UsePipes(new ValidationPipe())
+  async login(@Body() loginUserDto: LoginUserDto) {
+    const user = await this.userService.login(loginUserDto);
+    return this.userService.buildUserResponse(user);
   }
 
   @Get()
@@ -35,12 +44,12 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return await this.userService.update(+id, updateUserDto);
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(+id, updateUserDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return await this.userService.remove(+id);
+  remove(@Param('id') id: string) {
+    return this.userService.remove(+id);
   }
 }
