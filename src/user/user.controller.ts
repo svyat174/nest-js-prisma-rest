@@ -8,11 +8,14 @@ import {
   Put,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { AuthGuard } from './guards/auth.guard';
+import { User } from './decorator/user.decorator';
 
 @Controller('user')
 export class UserController {
@@ -33,8 +36,9 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  @UseGuards(AuthGuard)
+  findAll(@User('nickname') currentUserId: string) {
+    return this.userService.findAll(currentUserId);
   }
 
   @Get(':id')
@@ -43,13 +47,19 @@ export class UserController {
     return await this.userService.findOne(+id);
   }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Put()
+  @UseGuards(AuthGuard)
+  async update(
+    @User('id') currentUserId: number,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const user = await this.userService.update(currentUserId, updateUserDto);
+    return this.userService.buildUserResponse(user);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  @Delete()
+  @UseGuards(AuthGuard)
+  remove(@User('id') currentUserId: number) {
+    return this.userService.remove(currentUserId);
   }
 }

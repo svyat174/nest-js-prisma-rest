@@ -20,8 +20,14 @@ export class UserService {
     return await this.prisma.user.create({ data: createUserDto });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  findAll(nickname: string) {
+    if (nickname === 'Kristina') {
+      return this.prisma.user.findMany();
+    }
+    throw new HttpException(
+      'You dont have accept for get all User',
+      HttpStatus.NOT_ACCEPTABLE,
+    );
   }
 
   async findOne(id: number) {
@@ -85,7 +91,7 @@ export class UserService {
     );
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id },
       data: updateUserDto,
