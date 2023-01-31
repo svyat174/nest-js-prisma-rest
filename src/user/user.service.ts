@@ -14,20 +14,15 @@ export class UserService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
+    console.log(createUserDto);
     const hashPassword = await hash(createUserDto.password, 10);
     createUserDto.password = hashPassword;
 
     return await this.prisma.user.create({ data: createUserDto });
   }
 
-  findAll(nickname: string) {
-    if (nickname === 'Kristina') {
-      return this.prisma.user.findMany();
-    }
-    throw new HttpException(
-      'You dont have accept for get all User',
-      HttpStatus.NOT_ACCEPTABLE,
-    );
+  findAll() {
+    return this.prisma.user.findMany();
   }
 
   async findOne(id: number) {

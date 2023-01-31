@@ -16,6 +16,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { User } from './decorator/user.decorator';
+import { Roles } from './decorator/roles.decorator';
+import { Role } from '@prisma/client';
+import { RolesGuard } from './guards/roles.guard';
 
 @Controller('user')
 export class UserController {
@@ -23,7 +26,7 @@ export class UserController {
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body('user') createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
     return this.userService.buildUserResponse(user);
   }
@@ -36,9 +39,10 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AuthGuard)
-  findAll(@User('nickname') currentUserId: string) {
-    return this.userService.findAll(currentUserId);
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  findAll() {
+    return this.userService.findAll();
   }
 
   @Get(':id')

@@ -9,6 +9,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+enum Role {
+  Admin
+  User
+}
 
 model User {
   id    Int     @default(autoincrement()) @id
@@ -18,4 +22,32 @@ model User {
   name  String?
   image String?
   bio String?
+  role Role @default(User)
 }
+
+model Masters {
+  id Int @default(autoincrement()) @id
+  name String
+  image String?
+  bio String?
+  skills Skills[]
+  works Works[]
+}
+
+model Skills {
+  id Int @default(autoincrement()) @id
+  name String
+  master Masters[]
+}
+
+model Works {
+  id          Int  @default(autoincrement()) @id
+  author      Masters @relation(fields: [authorId], references: [id])
+  authorId    Int
+  image       String
+  description String
+  favourites  Int
+  date        DateTime
+  comments    String
+}
+
