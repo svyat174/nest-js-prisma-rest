@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Put,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -15,6 +18,8 @@ import { Roles } from 'src/user/decorator/roles.decorator';
 import { Role } from '@prisma/client';
 import { CreateSkillsDto } from './dto/sklll-create.dto';
 import { CreateWorkDto } from './dto/work-create.dto';
+import { UpdateMasterDto } from './dto/master-update.dto';
+import { UpdateWorkDto } from './dto/work-update.dto';
 
 @Controller('masters')
 export class MastersController {
@@ -54,5 +59,48 @@ export class MastersController {
   @Get()
   getMasters() {
     return this.masterService.getMasters();
+  }
+
+  @Get('by_skill/:id')
+  getBySkill(@Param('id') id: number) {
+    return this.masterService.getBySkill(id);
+  }
+
+  @Get('by_master/:id')
+  getByMaster(@Param('id') id: number) {
+    return this.masterService.getByMaster(id);
+  }
+
+  @Get('works')
+  getWorks() {
+    return this.masterService.getWork();
+  }
+
+  @Put('update/:id')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  updateMaster(
+    @Param('id') masterId: number,
+    @Body() updateMasterDto: UpdateMasterDto,
+  ) {
+    return this.masterService.updateMaster(masterId, updateMasterDto);
+  }
+
+  @Put('update_work/:id')
+  @UsePipes(new ValidationPipe())
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  updateWork(
+    @Param('id') workId: number,
+    @Body() updateWorkDto: UpdateWorkDto,
+  ) {
+    return this.masterService.updateWork(workId, updateWorkDto);
+  }
+
+  @Delete('delete_work/:id')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  deleteWork(@Param('id') workId: number) {
+    return this.masterService.deleteWork(workId);
   }
 }
