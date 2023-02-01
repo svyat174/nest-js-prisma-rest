@@ -15,39 +15,48 @@ enum Role {
 }
 
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  nickname String @unique
+  id       Int     @default(autoincrement()) @id
+  email    String  @unique
+  nickname String  @unique
   password String
-  name  String?
-  image String?
-  bio String?
-  role Role @default(User)
+  name     String?
+  image    String?
+  bio      String?
+  role     Role    @default(User)
 }
 
 model Masters {
-  id Int @default(autoincrement()) @id
-  name String
-  image String?
-  bio String?
-  skills Skills[]
-  works Works[]
+  id     Int              @default(autoincrement()) @id
+  name   String
+  image  String?
+  bio    String?
+  skills MastersOnSkills[]
+  works  Works[]
 }
 
-model Skills {
-  id Int @default(autoincrement()) @id
-  name String
-  master Masters[]
+model    Skills {
+  id     Int              @default(autoincrement()) @id
+  name   String
+  master MastersOnSkills[]
 }
 
 model Works {
-  id          Int  @default(autoincrement()) @id
-  author      Masters @relation(fields: [authorId], references: [id])
+  id          Int       @default(autoincrement()) @id
+  author      Masters   @relation(fields: [authorId], references: [id])
   authorId    Int
-  image       String
-  description String
-  favourites  Int
-  date        DateTime
-  comments    String
+  title       String
+  image       String?
+  description String?
+  favourites  Int       @default(0)
+  date        DateTime? @default(now())
+  comments    String?
+}
+
+model MastersOnSkills {
+  id         Int         @default(autoincrement()) @id
+  master     Masters     @relation(fields: [masterId], references: [id])
+  masterId   Int
+  skills     Skills      @relation(fields: [skillId], references: [id])
+  skillId    Int
 }
 
