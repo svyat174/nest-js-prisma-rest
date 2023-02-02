@@ -103,4 +103,9 @@ export class MastersController {
   deleteWork(@Param('id') workId: number) {
     return this.masterService.deleteWork(workId);
   }
+
+  @Get('works/:slug')
+  getWorksBySlug(@Param('slug') slug: string) {
+    return this.masterService.getWorksBySlug(slug);
+  }
 }

@@ -5,6 +5,7 @@ import { CreateSkillsDto } from './dto/sklll-create.dto';
 import { CreateWorkDto } from './dto/work-create.dto';
 import { UpdateMasterDto } from './dto/master-update.dto';
 import { UpdateWorkDto } from './dto/work-update.dto';
+import slugify from 'slugify';
 
 @Injectable()
 export class MastersService {
@@ -36,23 +37,58 @@ export class MastersService {
     });
   }
 
-  // don't forget to fix update by skills!!!
-  async updateMaster(masterId: number, updateMasterDto: UpdateMasterDto) {
-    return await this.prisma.masters.update({
-      where: { id: masterId },
-      data: {
-        name: updateMasterDto.name,
-        bio: updateMasterDto.bio,
-        image: updateMasterDto.image,
-      },
+  async createSkills(createSkillsDto: CreateSkillsDto) {
+    return await this.prisma.skills.create({
+      data: createSkillsDto,
     });
   }
 
-  async updateWork(workId: number, updateWorkDto: UpdateWorkDto) {
-    return this.prisma.works.update({
-      where: { id: workId },
-      data: updateWorkDto,
+  async createWorks(createWorkDto: CreateWorkDto) {
+    const work = await this.prisma.works.create({
+      data: createWorkDto,
     });
+
+    const slug = this.getSlug(work.title);
+
+    return this.prisma.works.update({
+      where: { id: work.id },
+      data: { slug: { set: slug } },
+    });
+  }
+
+  private getSlug(title: string) {
+    return (
+      slugify(title, { lower: true }) +
+      '-' +
+      ((Math.random() * Math.pow(36, 6)) | 0).toString(36)
+    );
+  }
+
+  // don't forget to fix update by skills!!!
+  async updateMaster(masterId: number, updateMasterDto: UpdateMasterDto) {
+    try {
+      return await this.prisma.masters.update({
+        where: { id: masterId },
+        data: {
+          name: updateMasterDto.name,
+          bio: updateMasterDto.bio,
+          image: updateMasterDto.image,
+        },
+      });
+    } catch (e) {
+      throw new HttpException('Master not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async updateWork(workId: number, updateWorkDto: UpdateWorkDto) {
+    try {
+      return await this.prisma.works.update({
+        where: { id: workId },
+        data: updateWorkDto,
+      });
+    } catch (e) {
+      throw new HttpException('Work not found', HttpStatus.NOT_FOUND);
+    }
   }
 
   async getSkills() {
@@ -97,20 +133,20 @@ export class MastersService {
     return works;
   }
 
+  async getWorksBySlug(slug: string) {
+    const works = await this.prisma.works.findMany({
+      where: { slug },
+    });
+
+    if (!works[0]) {
+      throw new HttpException('Works not found', HttpStatus.NOT_FOUND);
+    }
+
+    return works;
+  }
+
   async getWork() {
     return this.prisma.works.findMany();
-  }
-
-  async createSkills(createSkillsDto: CreateSkillsDto) {
-    return await this.prisma.skills.create({
-      data: createSkillsDto,
-    });
-  }
-
-  async createWorks(createWorkDto: CreateWorkDto) {
-    return await this.prisma.works.create({
-      data: createWorkDto,
-    });
   }
 
   async deleteWork(workId: number) {

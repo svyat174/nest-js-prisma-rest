@@ -53,6 +53,7 @@ export class UserController {
 
   @Put()
   @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe())
   async update(
     @User('id') currentUserId: number,
     @Body() updateUserDto: UpdateUserDto,
