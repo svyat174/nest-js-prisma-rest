@@ -23,6 +23,7 @@ model User {
   image    String?
   bio      String?
   role     Role    @default(User)
+  comment  Comments[]
 }
 
 model Masters {
@@ -45,11 +46,12 @@ model Works {
   author      Masters   @relation(fields: [authorId], references: [id])
   authorId    Int
   title       String
+  slug        String?    @unique
   image       String?
   description String?
   favourites  Int       @default(0)
   date        DateTime? @default(now())
-  comments    String?
+  comments    Comments[]
 }
 
 model MastersOnSkills {
@@ -60,3 +62,13 @@ model MastersOnSkills {
   skillId    Int
 }
 
+model Comments {
+  id        Int       @default(autoincrement()) @id
+  work      Works     @relation(fields: [workSlug], references: [slug])
+  workSlug  String
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+  text      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+}
