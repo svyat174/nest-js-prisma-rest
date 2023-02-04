@@ -78,20 +78,20 @@ model Comments {
 model Category {
   id Int @default(autoincrement()) @id
   categoryName String
-  product Product @relation(fields: [productId], references: [id])
-  productId Int
+  product Product[]
 }
 
 model Product {
   id        Int       @default(autoincrement()) @id
   title String
-  slug String @unique
-  category Category[]
+  slug String? @unique
+  categoryId Int
+  category Category  @relation(fields: [categoryId], references: [id])
   article String
   price Float
   image String
   description String
-  remains Boolean
+  remains Boolean?  @default(true)
   Sale Int?
   orderItems OrderItem[]
 }
