@@ -122,7 +122,7 @@ model Order {
   id        Int       @default(autoincrement()) @id
   items OrderItem[]
   totalAmount Float
-  isPaid Boolean
+  isPaid Boolean @default(false)
   addressId Int
   userId Int
   address Address @relation(fields: [addressId], references: [id])
