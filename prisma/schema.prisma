@@ -113,9 +113,9 @@ model Address {
 model User2Address {
   id        Int       @default(autoincrement()) @id
   userId Int
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   addressId Int
-  address Address @relation(fields: [addressId], references: [id])
+  address Address @relation(fields: [addressId], references: [id], onDelete: Cascade)
 }
 
 model Order {
