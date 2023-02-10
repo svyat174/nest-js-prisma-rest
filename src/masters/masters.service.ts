@@ -158,4 +158,51 @@ export class MastersService {
       throw new HttpException('Work not found', HttpStatus.NOT_FOUND);
     }
   }
+
+  async addWorkToFavourite(userId: number, workSlug: string) {
+    const work = await this.prisma.works.findFirst({
+      where: { slug: workSlug },
+    });
+
+    const hasUnique = await this.prisma.userToWorks.findFirst({
+      where: { userId, workSlug },
+    });
+
+    if (!hasUnique) {
+      await this.prisma.userToWorks.create({
+        data: {
+          workSlug,
+          userId,
+        },
+      });
+      work.favourites++;
+      return await this.prisma.works.update({
+        where: { slug: workSlug },
+        data: work,
+      });
+    }
+    return work;
+  }
+
+  async deleteWorkFromFavourite(userId: number, workSlug: string) {
+    const work = await this.prisma.works.findFirst({
+      where: { slug: workSlug },
+    });
+
+    const hasUnique = await this.prisma.userToWorks.findFirst({
+      where: { userId, workSlug },
+    });
+
+    if (hasUnique) {
+      await this.prisma.userToWorks.delete({
+        where: { id: hasUnique.id },
+      });
+      work.favourites--;
+      return await this.prisma.works.update({
+        where: { slug: workSlug },
+        data: work,
+      });
+    }
+    return work;
+  }
 }

@@ -20,6 +20,7 @@ import { CreateSkillsDto } from './dto/sklll-create.dto';
 import { CreateWorkDto } from './dto/work-create.dto';
 import { UpdateMasterDto } from './dto/master-update.dto';
 import { UpdateWorkDto } from './dto/work-update.dto';
+import { User } from 'src/user/decorator/user.decorator';
 
 @Controller('masters')
 export class MastersController {
@@ -107,5 +108,27 @@ export class MastersController {
   @Get('works/:slug')
   getWorksBySlug(@Param('slug') slug: string) {
     return this.masterService.getWorksBySlug(slug);
+  }
+
+  @Post('work/:slug/favorite')
+  @Roles(Role.User)
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard, RolesGuard)
+  addWorkToFavourite(
+    @User('id') userId: number,
+    @Param('slug') workSlug: string,
+  ) {
+    return this.masterService.addWorkToFavourite(userId, workSlug);
+  }
+
+  @Delete('work/:slug/favorite')
+  @Roles(Role.User)
+  @UsePipes(new ValidationPipe())
+  @UseGuards(AuthGuard, RolesGuard)
+  deleteWorkFromFavourite(
+    @User('id') userId: number,
+    @Param('slug') workSlug: string,
+  ) {
+    return this.masterService.deleteWorkFromFavourite(userId, workSlug);
   }
 }
