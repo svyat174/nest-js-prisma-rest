@@ -18,7 +18,7 @@ import { AuthGuard } from 'src/user/guards/auth.guard';
 import { RolesGuard } from 'src/user/guards/roles.guard';
 import { CreateProductDto } from './dto/product-create.dto';
 import { UpdateProductDto } from './dto/product-update.dto';
-import { PaginationQueryDto } from 'src/common/dto/pagination.query.dto';
+import { PaginationAndSearchQueryDto } from 'src/common/dto/pagination.query.dto';
 
 @Controller('product')
 export class ProductController {
@@ -52,14 +52,16 @@ export class ProductController {
   }
 
   @Get()
-  getAllProduct(@Query() paginationQuery: PaginationQueryDto) {
-    return this.productService.getAllProduct(paginationQuery);
+  getAllProduct(
+    @Query() paginationAndSearchQuery: PaginationAndSearchQueryDto,
+  ) {
+    return this.productService.getAllProduct(paginationAndSearchQuery);
   }
 
   @Get('category/:id')
   getProductByCategory(
     @Param('id') categoryId: number,
-    @Query() paginationQuery: PaginationQueryDto,
+    @Query() paginationQuery: PaginationAndSearchQueryDto,
   ) {
     return this.productService.getProductByCategory(
       categoryId,
@@ -70,7 +72,7 @@ export class ProductController {
   @Get(':slug')
   getProductById(
     @Param('slug') productSlug: string,
-    @Query() paginationQuery: PaginationQueryDto,
+    @Query() paginationQuery: PaginationAndSearchQueryDto,
   ) {
     return this.productService.getProductById(productSlug, paginationQuery);
   }

@@ -4,7 +4,7 @@ import slugify from 'slugify';
 import { PrismaService } from 'src/prisma.service';
 import { CreateProductDto } from './dto/product-create.dto';
 import { UpdateProductDto } from './dto/product-update.dto';
-import { PaginationQueryDto } from 'src/common/dto/pagination.query.dto';
+import { PaginationAndSearchQueryDto } from 'src/common/dto/pagination.query.dto';
 
 @Injectable()
 export class ProductService {
@@ -59,18 +59,26 @@ export class ProductService {
     })
   }
 
-  async getAllProduct(paginationQuery: PaginationQueryDto) {
-    const { limit, offset } = paginationQuery
+  async getAllProduct(
+    paginationAndSearchQuery: PaginationAndSearchQueryDto,
+  ) {
+    const { limit, offset, search } = paginationAndSearchQuery
     return this.prisma.product.findMany({
       orderBy: { price: 'asc'},
       take: limit,
-      skip: offset >= 0 ? offset : 0
+      skip: offset >= 0 ? offset : 0,
+      where: {
+        title: {
+          contains: search,
+          mode: 'insensitive'
+        }
+      }
     })
   }
 
   async getProductByCategory(
     categoryId: number, 
-    paginationQuery: PaginationQueryDto
+    paginationQuery: PaginationAndSearchQueryDto
   ) {
     const { limit, offset } = paginationQuery
     return this.prisma.product.findMany({
@@ -83,7 +91,7 @@ export class ProductService {
 
   async getProductById(
     productSlug: string, 
-    paginationQuery: PaginationQueryDto
+    paginationQuery: PaginationAndSearchQueryDto
   ) {
     const { limit, offset } = paginationQuery
     return this.prisma.product.findMany({
