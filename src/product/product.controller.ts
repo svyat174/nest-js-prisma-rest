@@ -52,10 +52,13 @@ export class ProductController {
   }
 
   @Get()
-  getAllProduct(
+  async getAllProduct(
     @Query() paginationAndSearchQuery: PaginationAndSearchQueryDto,
   ) {
-    return this.productService.getAllProduct(paginationAndSearchQuery);
+    const products = await this.productService.getAllProduct(
+      paginationAndSearchQuery,
+    );
+    return this.productService.buildProductsResponse(products);
   }
 
   @Get('category/:id')
@@ -75,5 +78,13 @@ export class ProductController {
     @Query() paginationQuery: PaginationAndSearchQueryDto,
   ) {
     return this.productService.getProductById(productSlug, paginationQuery);
+  }
+
+  @Get(':slug/items')
+  getOrdersBySlug(
+    @Param('slug') productSlug: string,
+    @Query() paginationQuery: PaginationAndSearchQueryDto,
+  ) {
+    return this.productService.getOrdersBySlug(productSlug, paginationQuery);
   }
 }
